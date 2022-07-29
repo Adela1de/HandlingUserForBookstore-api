@@ -1,6 +1,7 @@
 package com.example.userHandlingForBookstoreAPI.controllers;
 
 import com.example.userHandlingForBookstoreAPI.events.RegistrationCompleteEvent;
+import com.example.userHandlingForBookstoreAPI.events.ResendVerificationTokenEvent;
 import com.example.userHandlingForBookstoreAPI.model.UserModel;
 import com.example.userHandlingForBookstoreAPI.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +38,10 @@ public class RegistrationController {
 
     @GetMapping("/resendVerificationToken")
     public String resendVerificationToken(@RequestParam("token") String oldToken,
-                                          HttpServletRequest request)
+                                          final HttpServletRequest request)
     {
-        var verificationToken = userService.generateNewVerificationToken(oldToken);
-
-        return "Click the link to verify your account: " +
-                applicationUrl(request) +
-                "/verifyRegistration?token=" +
-                verificationToken.getToken();
+        publisher.publishEvent(new ResendVerificationTokenEvent(oldToken, applicationUrl(request)));
+        return "Verification Token resent";
     }
 
     private String applicationUrl(HttpServletRequest request)
