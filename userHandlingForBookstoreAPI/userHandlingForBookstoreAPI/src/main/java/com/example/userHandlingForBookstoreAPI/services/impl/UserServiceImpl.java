@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -31,8 +34,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveVerificationTokenForUser(User user, String token) {
+    public void saveVerificationTokenForUser(User user, String token)
+    {
         var verificationToken = new VerificationToken(user, token);
         verificationTokenRepository.save(verificationToken);
     }
+
+    @Override
+    public String validateVerificationToken(String token)
+    {
+        var verificationToken = verificationTokenRepository.findByToken(token);
+
+        if(verificationToken == null) return "Invalid token";
+
+        var cal = Calendar.getInstance();
+
+        if(verificationToken.getExpirationTime().getTime()
+            - cal.getTime().getTime() <= 0)
+        {
+            verificationTokenRepository.delete(verificationToken);
+            return "Token expired";
+        }
+
+        var user = verificationToken.getUser();
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        return "User successfully activated";
+    }
+
+    @Override
+    public VerificationToken generateNewVerificationToken(String oldToken) {
+        var verificationToken = verificationTokenRepository.findByToken(oldToken);
+        verificationToken.setToken(UUID.randomUUID().toString());
+        verificationTokenRepository.save(verificationToken);
+        return verificationToken;
+    }
+
 }
