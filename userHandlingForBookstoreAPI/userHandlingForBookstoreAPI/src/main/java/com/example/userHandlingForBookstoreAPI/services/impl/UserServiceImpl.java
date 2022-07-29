@@ -48,9 +48,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String validateVerificationToken(String token) {
-        var verificationToken = verificationTokenRepository.findByToken(token);
-
-        if (verificationToken == null) throw new ObjectInvalidException("Invalid token");
+        var verificationToken =
+                verificationTokenRepository.
+                findByToken(token).orElseThrow(
+                                () -> new ObjectNotFoundException("Invalid token"));
 
         var cal = Calendar.getInstance();
 
@@ -69,7 +70,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public VerificationToken generateNewVerificationToken(String oldToken) {
-        var verificationToken = verificationTokenRepository.findByToken(oldToken);
+        var verificationToken =
+                verificationTokenRepository.
+                findByToken(oldToken).orElseThrow(() ->
+                                new ObjectNotFoundException("This token does not exists! "));
+
         verificationToken.setToken(UUID.randomUUID().toString());
         verificationTokenRepository.save(verificationToken);
         return verificationToken;
@@ -90,13 +95,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String validatePasswordResetToken(String token) {
-        var passwordResetToken = new PasswordResetToken();
-        try
-        {
-            passwordResetToken = passwordResetTokenRepository.findByToken(token);
-        } catch (NullPointerException e){
-            throw new ObjectNotFoundException("There is no registered token for this e-mail!");
-        }
+        var passwordResetToken =
+                passwordResetTokenRepository.
+                findByToken(token).
+                orElseThrow(() ->
+                        new ObjectNotFoundException("There is no registered token for this e-mail!"));
 
         var cal = Calendar.getInstance();
 
@@ -112,10 +115,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByPasswordResetToken(String token) {
         var user =
-                passwordResetTokenRepository.
-                findByToken(token).getUser();
-        if(user == null) new ObjectNotFoundException("There is no registered user for this token!");
-
+            passwordResetTokenRepository.
+            findByToken(token).orElseThrow(() ->
+                        new ObjectNotFoundException("There is no registered user for this token!")).getUser();
         return user;
     }
 
