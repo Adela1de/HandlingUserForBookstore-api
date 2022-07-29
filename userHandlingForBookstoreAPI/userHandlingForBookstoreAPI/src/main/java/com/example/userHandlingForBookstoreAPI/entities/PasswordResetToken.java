@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Date;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,9 +21,9 @@ public class PasswordResetToken {
     private Date expirationTime;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn
-            (name = "user_id",
-                    nullable = false,
-                    foreignKey = @ForeignKey(name = "FK_USER_PASSWORD_TOKEN"))
+        (name = "user_id",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "FK_USER_PASSWORD_TOKEN"))
     private User user;
 
 

@@ -5,6 +5,7 @@ import com.example.userHandlingForBookstoreAPI.entities.User;
 import com.example.userHandlingForBookstoreAPI.entities.VerificationToken;
 import com.example.userHandlingForBookstoreAPI.exceptions.ObjectInvalidException;
 import com.example.userHandlingForBookstoreAPI.exceptions.ObjectNotFoundException;
+import com.example.userHandlingForBookstoreAPI.exceptions.TokenExpiredException;
 import com.example.userHandlingForBookstoreAPI.model.UserModel;
 import com.example.userHandlingForBookstoreAPI.repositories.PasswordResetTokenRepository;
 import com.example.userHandlingForBookstoreAPI.repositories.UserRepository;
@@ -89,21 +90,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String validatePasswordResetToken(String token) {
-        var passwordResetToken =
-                passwordResetTokenRepository.
-                findByToken(token);
-
-        if (passwordResetToken == null) throw new ObjectNotFoundException("There is no registered token for this e-mail!");
+        var passwordResetToken = new PasswordResetToken();
+        try
+        {
+            passwordResetToken = passwordResetTokenRepository.findByToken(token);
+        } catch (NullPointerException e){
+            throw new ObjectNotFoundException("There is no registered token for this e-mail!");
+        }
 
         var cal = Calendar.getInstance();
 
         if (passwordResetToken.getExpirationTime().getTime()
                 - cal.getTime().getTime() <= 0) {
             passwordResetTokenRepository.delete(passwordResetToken);
-            return "Token expired";
+            throw new TokenExpiredException("Token expired");
         }
 
-        return "valid";
+        return passwordResetToken.getToken();
     }
 
     @Override
