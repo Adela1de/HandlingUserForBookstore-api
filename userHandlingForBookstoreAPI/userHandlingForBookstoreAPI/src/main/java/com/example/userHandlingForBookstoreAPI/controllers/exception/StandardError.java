@@ -1,4 +1,4 @@
-package com.example.userHandlingForBookstoreAPI.controllers.controllerExceptionHandler;
+package com.example.userHandlingForBookstoreAPI.controllers.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

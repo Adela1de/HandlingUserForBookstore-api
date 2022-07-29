@@ -3,6 +3,7 @@ package com.example.userHandlingForBookstoreAPI.services.impl;
 import com.example.userHandlingForBookstoreAPI.entities.PasswordResetToken;
 import com.example.userHandlingForBookstoreAPI.entities.User;
 import com.example.userHandlingForBookstoreAPI.entities.VerificationToken;
+import com.example.userHandlingForBookstoreAPI.exceptions.MatchingOldPasswordException;
 import com.example.userHandlingForBookstoreAPI.exceptions.ObjectInvalidException;
 import com.example.userHandlingForBookstoreAPI.exceptions.ObjectNotFoundException;
 import com.example.userHandlingForBookstoreAPI.exceptions.TokenExpiredException;
@@ -122,11 +123,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(User user, String newPassword)
+    public void resetPassword(User user, String newPassword)
     {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
+    }
+
+    @Override
+    public void changePassword(User user, String oldPassword, String newPassword) {
+        if(passwordEncoder.matches(oldPassword, user.getPassword()))
+        {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        }else throw new MatchingOldPasswordException("The passwords don't match!");
     }
 
 }

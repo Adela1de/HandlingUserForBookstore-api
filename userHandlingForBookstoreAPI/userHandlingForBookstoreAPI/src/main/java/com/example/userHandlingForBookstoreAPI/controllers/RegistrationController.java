@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin("*")
+@RequestMapping(value = "/users")
 public class RegistrationController {
 
     private final UserService userService;
@@ -55,13 +56,20 @@ public class RegistrationController {
 
     @PostMapping("savePassword")
     public String savePassword(@RequestParam("token") String token,
-                                @RequestBody PasswordModel passwordModel,
-                                final HttpServletRequest request)
+                                @RequestBody PasswordModel passwordModel)
     {
         String result = userService.validatePasswordResetToken(token);
         var user = userService.getUserByPasswordResetToken(result);
-        userService.changePassword(user, passwordModel.getNewPassword());
+        userService.resetPassword(user, passwordModel.getNewPassword());
         return "Password Reset";
+    }
+
+    @PostMapping("changePassword")
+    public String changePassword(@RequestBody PasswordModel passwordModel)
+    {
+        var user = userService.findUserByEmail(passwordModel.getEmail());
+        userService.changePassword(user, passwordModel.getOldPassword(), passwordModel.getNewPassword());
+        return "Password changed";
     }
 
     private String applicationUrl(HttpServletRequest request)

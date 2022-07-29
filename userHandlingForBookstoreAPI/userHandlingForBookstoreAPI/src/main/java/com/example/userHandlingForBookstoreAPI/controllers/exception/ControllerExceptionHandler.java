@@ -1,5 +1,6 @@
-package com.example.userHandlingForBookstoreAPI.controllers.controllerExceptionHandler;
+package com.example.userHandlingForBookstoreAPI.controllers.exception;
 
+import com.example.userHandlingForBookstoreAPI.exceptions.MatchingOldPasswordException;
 import com.example.userHandlingForBookstoreAPI.exceptions.ObjectInvalidException;
 import com.example.userHandlingForBookstoreAPI.exceptions.ObjectNotFoundException;
 import com.example.userHandlingForBookstoreAPI.exceptions.TokenExpiredException;
@@ -33,4 +34,13 @@ public class ControllerExceptionHandler {
         var error = new StandardError(e.getMessage(), HttpStatus.NOT_FOUND.value(), System.currentTimeMillis());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+
+    @ExceptionHandler(MatchingOldPasswordException.class)
+    public ResponseEntity<StandardError> matchingOldPasswordException(
+            MatchingOldPasswordException e, ServletException request)
+    {
+        var error = new StandardError(e.getMessage(), HttpStatus.NOT_FOUND.value(), System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
 }
