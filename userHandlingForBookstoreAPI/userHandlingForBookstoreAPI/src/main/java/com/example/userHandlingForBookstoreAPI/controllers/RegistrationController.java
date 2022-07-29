@@ -3,7 +3,6 @@ package com.example.userHandlingForBookstoreAPI.controllers;
 import com.example.userHandlingForBookstoreAPI.events.RegistrationCompleteEvent;
 import com.example.userHandlingForBookstoreAPI.events.ResendVerificationTokenEvent;
 import com.example.userHandlingForBookstoreAPI.events.ResetPasswordEvent;
-import com.example.userHandlingForBookstoreAPI.events.SaveResetPasswordEvent;
 import com.example.userHandlingForBookstoreAPI.model.PasswordModel;
 import com.example.userHandlingForBookstoreAPI.model.UserModel;
 import com.example.userHandlingForBookstoreAPI.services.UserService;
@@ -12,7 +11,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,7 +50,7 @@ public class RegistrationController {
                                 final HttpServletRequest request)
     {
         publisher.publishEvent(new ResetPasswordEvent(passwordModel.getEmail(), applicationUrl(request)));
-        return "Password reset successfully!";
+        return "Reset link sent";
     }
 
     @PostMapping("savePassword")
@@ -60,12 +58,10 @@ public class RegistrationController {
                                 @RequestBody PasswordModel passwordModel,
                                 final HttpServletRequest request)
     {
-        publisher.publishEvent(new SaveResetPasswordEvent(
-                token,
-                passwordModel.getOldPassword(),
-                passwordModel.getNewPassword(),
-                applicationUrl(request)));
-        return "";
+        String result = userService.validatePasswordResetToken(token);
+        var user = userService.getUserByPasswordResetToken(result);
+        userService.changePassword(user, passwordModel.getNewPassword());
+        return "Password Reset";
     }
 
     private String applicationUrl(HttpServletRequest request)

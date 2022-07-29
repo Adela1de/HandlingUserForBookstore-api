@@ -3,6 +3,8 @@ package com.example.userHandlingForBookstoreAPI.services.impl;
 import com.example.userHandlingForBookstoreAPI.entities.PasswordResetToken;
 import com.example.userHandlingForBookstoreAPI.entities.User;
 import com.example.userHandlingForBookstoreAPI.entities.VerificationToken;
+import com.example.userHandlingForBookstoreAPI.exceptions.ObjectInvalidException;
+import com.example.userHandlingForBookstoreAPI.exceptions.ObjectNotFoundException;
 import com.example.userHandlingForBookstoreAPI.model.UserModel;
 import com.example.userHandlingForBookstoreAPI.repositories.PasswordResetTokenRepository;
 import com.example.userHandlingForBookstoreAPI.repositories.UserRepository;
@@ -13,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -48,14 +49,14 @@ public class UserServiceImpl implements UserService {
     public String validateVerificationToken(String token) {
         var verificationToken = verificationTokenRepository.findByToken(token);
 
-        if (verificationToken == null) return "Invalid token";
+        if (verificationToken == null) throw new ObjectInvalidException("Invalid token");
 
         var cal = Calendar.getInstance();
 
         if (verificationToken.getExpirationTime().getTime()
                 - cal.getTime().getTime() <= 0) {
             verificationTokenRepository.delete(verificationToken);
-            return "Token expired";
+            throw new ObjectInvalidException("Expired token");
         }
 
         var user = verificationToken.getUser();
@@ -88,9 +89,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String validatePasswordResetToken(String token) {
-        var passwordResetToken = passwordResetTokenRepository.findByToken(token);
+        var passwordResetToken =
+                passwordResetTokenRepository.
+                findByToken(token);
 
-        if (passwordResetToken == null) return "Invalid token";
+        if (passwordResetToken == null) throw new ObjectNotFoundException("There is no registered token for this e-mail!");
 
         var cal = Calendar.getInstance();
 
@@ -104,18 +107,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getUserByPasswordResetToken(String token) {
-        return Optional.ofNullable(passwordResetTokenRepository.findByToken(token).getUser());
+    public User getUserByPasswordResetToken(String token) {
+        var user =
+                passwordResetTokenRepository.
+                findByToken(token).getUser();
+        if(user == null) new ObjectNotFoundException("There is no registered user for this token!");
+
+        return user;
     }
 
     @Override
-    public void changePassword(User user, String newPassword, String oldPassword)
+    public void changePassword(User user, String newPassword)
     {
-        if(passwordEncoder.matches(newPassword, user.getPassword()))
-        {
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
 
     }
 

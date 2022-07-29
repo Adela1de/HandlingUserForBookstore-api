@@ -4,8 +4,6 @@ import com.example.userHandlingForBookstoreAPI.entities.User;
 import com.example.userHandlingForBookstoreAPI.entities.VerificationToken;
 import com.example.userHandlingForBookstoreAPI.model.UserModel;
 
-import java.util.Optional;
-
 public interface UserService {
 
     User registerUser(UserModel userModel);
@@ -22,7 +20,7 @@ public interface UserService {
 
     String validatePasswordResetToken(String token);
 
-    Optional<User> getUserByPasswordResetToken(String token);
+    User getUserByPasswordResetToken(String token);
 
-    void changePassword(User user,String oldPassword, String newPassword);
+    void changePassword(User user, String newPassword);
 }
