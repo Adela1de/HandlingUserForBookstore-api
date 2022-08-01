@@ -9,37 +9,37 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
     @ExceptionHandler(ObjectNotFoundException.class)
-    public ResponseEntity<StandardError> objectNotFoundException(ObjectNotFoundException e, ServletException request)
+    public ResponseEntity<StandardError> objectNotFoundException(ObjectNotFoundException e, ServletRequest request)
     {
         var error = new StandardError(e.getMessage(), HttpStatus.NOT_FOUND.value(), System.currentTimeMillis());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(ObjectInvalidException.class)
-    public ResponseEntity<StandardError> objectInvalidException(ObjectInvalidException e, ServletException request)
+    public ResponseEntity<StandardError> objectInvalidException(ObjectInvalidException e, ServletRequest request)
     {
-        var error = new StandardError(e.getMessage(), HttpStatus.NOT_FOUND.value(), System.currentTimeMillis());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        var error = new StandardError(e.getMessage(), HttpStatus.BAD_REQUEST.value(), System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(TokenExpiredException.class)
-    public ResponseEntity<StandardError> tokenExpiredException(TokenExpiredException e, ServletException request)
+    public ResponseEntity<StandardError> tokenExpiredException(TokenExpiredException e, ServletRequest request)
     {
-        var error = new StandardError(e.getMessage(), HttpStatus.NOT_FOUND.value(), System.currentTimeMillis());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        var error = new StandardError(e.getMessage(), HttpStatus.BAD_REQUEST.value(), System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(MatchingOldPasswordException.class)
     public ResponseEntity<StandardError> matchingOldPasswordException(
-            MatchingOldPasswordException e, ServletException request)
+            MatchingOldPasswordException e, ServletRequest request)
     {
-        var error = new StandardError(e.getMessage(), HttpStatus.NOT_FOUND.value(), System.currentTimeMillis());
+        var error = new StandardError(e.getMessage(), HttpStatus.BAD_REQUEST.value(), System.currentTimeMillis());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 

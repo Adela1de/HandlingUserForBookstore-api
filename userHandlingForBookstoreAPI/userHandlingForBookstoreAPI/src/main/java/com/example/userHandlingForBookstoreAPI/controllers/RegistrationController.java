@@ -46,7 +46,7 @@ public class RegistrationController {
         return "Verification Token resent";
     }
 
-    @PostMapping("resetPassword")
+    @PostMapping("/resetPassword")
     public String resetPassword(@RequestBody PasswordModel passwordModel,
                                 final HttpServletRequest request)
     {
@@ -54,17 +54,17 @@ public class RegistrationController {
         return "Reset link sent";
     }
 
-    @PostMapping("savePassword")
+    @PostMapping("/savePassword")
     public String savePassword(@RequestParam("token") String token,
                                 @RequestBody PasswordModel passwordModel)
     {
-        String result = userService.validatePasswordResetToken(token);
-        var user = userService.getUserByPasswordResetToken(result);
+        userService.validatePasswordResetToken(token);
+        var user = userService.getUserByPasswordResetToken(token);
         userService.resetPassword(user, passwordModel.getNewPassword());
         return "Password Reset";
     }
 
-    @PostMapping("changePassword")
+    @PostMapping("/changePassword")
     public String changePassword(@RequestBody PasswordModel passwordModel)
     {
         var user = userService.findUserByEmail(passwordModel.getEmail());

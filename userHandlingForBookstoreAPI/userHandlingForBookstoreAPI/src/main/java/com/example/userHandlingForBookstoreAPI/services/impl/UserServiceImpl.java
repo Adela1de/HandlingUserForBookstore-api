@@ -32,8 +32,8 @@ public class UserServiceImpl implements UserService {
     public User registerUser(UserModel userModel)
     {
         var user = new User();
-        user.setUsername(userModel.getUsername());
-        user.setEmail(userModel.getEmail());
+        user.setUsername( userModel.getUsername() );
+        user.setEmail( userModel.getEmail() );
         user.setPassword(passwordEncoder.encode( userModel.getPassword()) );
         user.setRole("USER");
         userRepository.save(user);
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String validatePasswordResetToken(String token) {
+    public void validatePasswordResetToken(String token) {
         var passwordResetToken =
                 passwordResetTokenRepository.
                 findByToken(token).
@@ -109,8 +109,6 @@ public class UserServiceImpl implements UserService {
             passwordResetTokenRepository.delete(passwordResetToken);
             throw new TokenExpiredException("Token expired");
         }
-
-        return passwordResetToken.getToken();
     }
 
     @Override
@@ -127,16 +125,14 @@ public class UserServiceImpl implements UserService {
     {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-
     }
 
     @Override
-    public void changePassword(User user, String oldPassword, String newPassword) {
-        if(passwordEncoder.matches(oldPassword, user.getPassword()))
-        {
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-        }else throw new MatchingOldPasswordException("The passwords don't match!");
+    public void changePassword(User user, String oldPassword, String newPassword)
+    {
+        if(passwordEncoder.matches(oldPassword, user.getPassword())) { resetPassword(user, newPassword); }
+        else throw new MatchingOldPasswordException("The passwords don't match!");
+
     }
 
 }
