@@ -7,14 +7,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Oath-authorization-server" />
         <module name="userHandlingForBookstoreAPI" />
+        <module name="Oauth-authorization-server" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="Oath-authorization-server" options="-parameters" />
+      <module name="Oauth-authorization-server" options="-parameters" />
       <module name="userHandlingForBookstoreAPI" options="-parameters" />
     </option>
   </component>

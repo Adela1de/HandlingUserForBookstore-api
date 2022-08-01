@@ -16,7 +16,7 @@
 
     <modules>
         <module>userHandlingForBookstoreAPI/userHandlingForBookstoreAPI</module>
-        <module>Oath-authorization-server/Oath-authorization-server</module>
+        <module>Oauth-authorization-server/Oauth-authorization-server</module>
     </modules>
 
 </project>
